@@ -101,8 +101,7 @@ class Query<T extends object, M extends object> {
 
   list<
     U extends QueryListOptions<T>,
-    K extends string | number = string,
-    Outputformat = U['format'] extends EntityFormatType ? Entity<T, M> : EntityData<T & { id: K }>
+    Outputformat = U['format'] extends EntityFormatType ? Entity<T, M> : EntityData<T & { id: string }>
   >(options: U = {} as U): PromiseWithPopulate<QueryResponse<T, Outputformat[]>> {
     // If global options set in schema, we extend it with passed options
     if ({}.hasOwnProperty.call(this.Model.schema.shortcutQueries, 'list')) {

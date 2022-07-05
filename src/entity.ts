@@ -222,9 +222,7 @@ export class GstoreEntity<T extends object = GenericObject> {
    * @param options Additional configuration
    * @link https://sebloix.gitbook.io/gstore-node/entity/methods/plain
    */
-  plain<K extends string | number = string, V = {}>(
-    options: PlainOptions | undefined = {},
-  ): EntityData<T & { id: K } & V> {
+  plain<V = {}>(options: PlainOptions | undefined = {}): EntityData<T & { id: string } & V> {
     if (!is.object(options)) {
       throw new Error('Options must be an Object');
     }
@@ -246,7 +244,7 @@ export class GstoreEntity<T extends object = GenericObject> {
       },
     );
 
-    return data as EntityData<T & { id: K } & V>;
+    return data as EntityData<T & { id: string } & V>;
   }
 
   get<P extends keyof T>(path: P): any {
@@ -380,7 +378,7 @@ export class GstoreEntity<T extends object = GenericObject> {
     }
   }
 
-  get id(): string | number {
+  get id(): string {
     return this.entityKey.id || this.entityKey.name!;
   }
 
@@ -488,7 +486,12 @@ export class GstoreEntity<T extends object = GenericObject> {
     let path: (string | number)[] = hasAncestors ? [...ancestors!] : [];
 
     if (id) {
-      path = [...path, this.entityKind, id];
+      const nid = Number(id);
+      if (isNaN(nid)) {
+        path = [...path, this.entityKind, id.toString()];
+      } else {
+        path = [...path, this.entityKind, nid];
+      }
     } else {
       path.push(this.entityKind);
     }

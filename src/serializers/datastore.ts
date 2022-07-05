@@ -63,17 +63,14 @@ const fromDatastore = <F extends 'JSON' | 'ENTITY' = 'JSON', R = F extends 'ENTI
     let keyData = entityData[Model.gstore.ds.KEY as any];
     // datastore can return id as a string however we need to ensure that the path
     // is correctly a number in order to return the correct entity key
-    if (keyData.id && typeof keyData.id !== 'number') {
+    if (keyData.id && typeof keyData.id !== 'string') {
       const path = [...keyData.path];
-      const id = Number(path.pop());
-      // if id is still not a number then we ignore since it is either really a string or another non-number type
-      if (!isNaN(id)) {
-        keyData = {
-          ...keyData,
-          id,
-          path: [...path, Number(id)],
-        };
-      }
+      const id = path.pop().toString();
+      keyData = {
+        ...keyData,
+        id,
+        path: [...path, id],
+      };
     }
     if (Model.gstore.ds.isKey(keyData)) {
       return keyData;

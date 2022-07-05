@@ -191,8 +191,7 @@ export interface Model<
    */
   query<
     F extends JSONFormatType | EntityFormatType = JSONFormatType,
-    K = string | number,
-    R = F extends EntityFormatType ? QueryResponse<T, Entity<T, M>[]> : QueryResponse<T, EntityData<T & { id: K }>[]>
+    R = F extends EntityFormatType ? QueryResponse<T, Entity<T, M>[]> : QueryResponse<T, EntityData<T & { id: string }>[]>
   >(
     namespace?: string,
     transaction?: Transaction,
@@ -310,7 +309,12 @@ export const generateModel = <T extends object, M extends object>(
         let path: IdType[] = [this.entityKind];
 
         if (typeof id !== 'undefined' && id !== null) {
-          path.push(id);
+          const nid = Number(id);
+          if (isNaN(nid)) {
+            path.push(id.toString());
+          } else {
+            path.push(nid);
+          }
         }
 
         if (ancestors && is.array(ancestors)) {
