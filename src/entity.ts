@@ -90,7 +90,7 @@ export class GstoreEntity<T extends object = GenericObject> {
    * @returns {Promise<GstoreEntity<T>>}
    * @link https://sebloix.gitbook.io/gstore-node/entity/methods/save
    */
-  save(transaction?: Transaction, opts?: SaveOptions): Promise<Entity<T>> {
+  save(transaction?: Transaction, opts?: SaveOptions): Promise<this> {
     this.__hooksEnabled = true;
 
     const options = {
@@ -132,14 +132,14 @@ export class GstoreEntity<T extends object = GenericObject> {
       return { error: entityDataError || methodError! };
     };
 
-    const onEntitySaved = (): Promise<Entity<T>> => {
+    const onEntitySaved = (): Promise<this> => {
       /**
        * Make sure to clear the cache for this Entity Kind
        */
       if ((this.constructor as Model).__hasCache(options)) {
         return (this.constructor as Model)
           .clearCache()
-          .then(() => (this as unknown) as Entity<T>)
+          .then(() => this)
           .catch((err: any) => {
             let msg = 'Error while clearing the cache after saving the entity.';
             msg += 'The entity has been saved successfully though. ';
@@ -151,7 +151,7 @@ export class GstoreEntity<T extends object = GenericObject> {
           });
       }
 
-      return Promise.resolve((this as unknown) as Entity<T>);
+      return Promise.resolve(this);
     };
 
     /**
@@ -195,7 +195,7 @@ export class GstoreEntity<T extends object = GenericObject> {
       attachPostHooksToTransaction();
       transaction.save(datastoreEntity);
 
-      return Promise.resolve((this as unknown) as Entity<T>);
+      return Promise.resolve(this);
     }
 
     return this.gstore.ds.save(datastoreEntity).then(onEntitySaved);
@@ -222,7 +222,9 @@ export class GstoreEntity<T extends object = GenericObject> {
    * @param options Additional configuration
    * @link https://sebloix.gitbook.io/gstore-node/entity/methods/plain
    */
-  plain(options: PlainOptions | undefined = {}): Partial<EntityData<T>> & { [key: string]: any } {
+  plain<K extends string | number = string, V = {}>(
+    options: PlainOptions | undefined = {},
+  ): EntityData<T & { id: K } & V> {
     if (!is.object(options)) {
       throw new Error('Options must be an Object');
     }
@@ -244,7 +246,7 @@ export class GstoreEntity<T extends object = GenericObject> {
       },
     );
 
-    return data;
+    return data as EntityData<T & { id: K } & V>;
   }
 
   get<P extends keyof T>(path: P): any {
@@ -254,14 +256,14 @@ export class GstoreEntity<T extends object = GenericObject> {
     return this.entityData[path];
   }
 
-  set<P extends keyof T>(path: P, value: any): Entity<T> {
+  set<P extends keyof T>(path: P, value: any): this {
     if ({}.hasOwnProperty.call(this.schema.__virtuals, path)) {
       this.schema.__virtuals[path as string].applySetters(value, this.entityData);
-      return (this as unknown) as Entity<T>;
+      return this;
     }
 
     this.entityData[path] = value;
-    return (this as unknown) as Entity<T>;
+    return this;
   }
 
   /**
@@ -287,8 +289,8 @@ export class GstoreEntity<T extends object = GenericObject> {
    *
    * @link https://sebloix.gitbook.io/gstore-node/entity/methods/datastoreentity
    */
-  datastoreEntity(options = {}): Promise<Entity<T> | null> {
-    const onEntityFetched = (result: [EntityData<T> | null]): Entity<T> | null => {
+  datastoreEntity(options = {}): Promise<this | null> {
+    const onEntityFetched = (result: [EntityData<T> | null]): this | null => {
       const entityData = result ? result[0] : null;
 
       if (!entityData) {
@@ -302,7 +304,7 @@ export class GstoreEntity<T extends object = GenericObject> {
       }
 
       this.entityData = entityData;
-      return (this as unknown) as Entity<T>;
+      return this;
     };
 
     if ((this.constructor as Model<T>).__hasCache(options)) {

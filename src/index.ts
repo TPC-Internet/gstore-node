@@ -7,7 +7,7 @@ import DataLoader from 'dataloader';
 import { Datastore, Transaction } from '@google-cloud/datastore';
 import pkg from '../package.json';
 import GstoreSchema from './schema';
-import GstoreEntity, { Entity as EntityType } from './entity';
+import GstoreEntity from './entity';
 import GstoreModel, { generateModel } from './model';
 import defaultValues, { DefaultValues } from './helpers/defaultValues';
 import { GstoreError, ValidationError, TypeError, ValueError, ERROR_CODES } from './errors';
@@ -165,7 +165,7 @@ export class Gstore {
    * @link https://sebloix.gitbook.io/gstore-node/gstore-methods/save
    */
   save(
-    entities: GstoreEntity | GstoreEntity[],
+    entities: GstoreEntity<any> | GstoreEntity<any>[],
     transaction?: Transaction,
     options: { method?: DatastoreSaveMethod; validate?: boolean } | undefined = {},
   ): Promise<
@@ -299,7 +299,8 @@ export const instances = {
 
 // Export Types
 
-export type Entity<T extends object = GenericObject> = EntityType<T>;
+export type { Entity } from './entity';
+export { GstoreEntity };
 
 export type Model<
   T extends object = GenericObject,

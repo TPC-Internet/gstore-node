@@ -191,7 +191,8 @@ export interface Model<
    */
   query<
     F extends JSONFormatType | EntityFormatType = JSONFormatType,
-    R = F extends EntityFormatType ? QueryResponse<T, Entity<T, M>[]> : QueryResponse<T, EntityData<T>[]>
+    K = string | number,
+    R = F extends EntityFormatType ? QueryResponse<T, Entity<T, M>[]> : QueryResponse<T, EntityData<T & { id: K }>[]>
   >(
     namespace?: string,
     transaction?: Transaction,
