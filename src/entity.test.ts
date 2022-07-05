@@ -484,7 +484,7 @@ describe('GstoreEntity', () => {
       const UserModel = gstore.model('UserWithVirtuals', userSchame);
       const user = new UserModel({ firstName: 'John', lastName: 'Snow' });
 
-      const output = user.plain<string, { fullName: string }>({ virtuals: true });
+      const output = user.plain<{ fullName: string }>({ virtuals: true });
       expect(output.fullName).to.equal('John Snow');
     });
 
