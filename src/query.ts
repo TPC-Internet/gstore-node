@@ -1,7 +1,7 @@
 import extend from 'extend';
 import is from 'is';
 
-import { Transaction, Query as DatastoreQuery } from '@google-cloud/datastore';
+import { Transaction, Query as DatastoreQuery, Key } from '@google-cloud/datastore';
 
 import Model from './model';
 import { Entity } from './entity';
@@ -101,7 +101,8 @@ class Query<T extends object, M extends object> {
 
   list<
     U extends QueryListOptions<T>,
-    Outputformat = U['format'] extends EntityFormatType ? Entity<T, M> : EntityData<T>
+    K extends string | number = string,
+    Outputformat = U['format'] extends EntityFormatType ? Entity<T, M> : EntityData<T & { id: K }>
   >(options: U = {} as U): PromiseWithPopulate<QueryResponse<T, Outputformat[]>> {
     // If global options set in schema, we extend it with passed options
     if ({}.hasOwnProperty.call(this.Model.schema.shortcutQueries, 'list')) {
@@ -219,12 +220,20 @@ class Query<T extends object, M extends object> {
   }
 }
 
-export interface GstoreQuery<T, R> extends Omit<DatastoreQuery, 'run' | 'filter' | 'order'> {
+export interface GstoreQuery<T, R>
+  extends Omit<DatastoreQuery, 'run' | 'select' | 'filter' | 'order' | 'limit' | 'start' | 'hasAncestor'> {
   __originalRun: DatastoreQuery['run'];
   run: QueryRunFunc<T, R>;
+  select(fieldNames: string | string[]): this;
   filter<P extends keyof T>(property: P, value: T[P]): this;
   filter<P extends keyof T>(property: P, operator: DatastoreOperator, value: T[P]): this;
+  filter<P extends keyof T, E>(property: P, operator: DatastoreOperator, value: E): this;
+  filter(property: string, operator: DatastoreOperator, value: any): this;
+  filter(property: string, value: any): this;
   order(property: keyof T, options?: OrderOptions): this;
+  limit(n: number): this;
+  start(start: string | Buffer): this;
+  hasAncestor(key: Key): this;
 }
 
 type QueryRunFunc<T, R> = (
