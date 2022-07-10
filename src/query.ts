@@ -231,7 +231,7 @@ export interface GstoreQuery<T, R>
   filter(property: string, value: any): this;
   order(property: keyof T, options?: OrderOptions): this;
   limit(n: number): this;
-  start(start: string | Buffer): this;
+  start(start: string | Buffer | null): this;
   hasAncestor(key: Key): this;
 }
 
