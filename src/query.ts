@@ -239,7 +239,7 @@ export interface GstoreQuery<T, R>
   select(fieldNames: string | string[]): this;
   limit(n: number): this;
   offset(n: number): this;
-  start(start: string | Buffer): this;
+  start(start: string | Buffer | null): this;
 }
 
 type QueryRunFunc<T, R> = (
