@@ -91,7 +91,7 @@ export interface Model<
     namespace?: string,
     transaction?: Transaction,
     options?: GetOptions,
-  ): PromiseWithPopulate<U extends Array<string | number> ? Entity<T, M>[] : Entity<T, M>>;
+  ): PromiseWithPopulate<U extends Array<string | number> ? Entity<T, M>[] : Entity<T, M> | null>;
 
   /**
    * Update an Entity in the Datastore. This method _partially_ updates an entity data in the Datastore
@@ -364,7 +364,7 @@ export const generateModel = <T extends object, M extends object>(
       namespace?: string,
       transaction?: Transaction,
       options: GetOptions = {},
-    ): PromiseWithPopulate<U extends Array<string | number> ? GstoreEntity<T>[] : GstoreEntity<T>> {
+    ): PromiseWithPopulate<U extends Array<string | number> ? GstoreEntity<T>[] : GstoreEntity<T> | null> {
       const ids = arrify(id);
 
       const key = this.key(ids, ancestors, namespace);
@@ -422,7 +422,9 @@ export const generateModel = <T extends object, M extends object>(
 
       (promise as any).populate = populateFactory(refsToPopulate, promise, this.schema);
 
-      return promise as PromiseWithPopulate<U extends Array<string | number> ? GstoreEntity<T>[] : GstoreEntity<T>>;
+      return promise as PromiseWithPopulate<
+        U extends Array<string | number> ? GstoreEntity<T>[] : GstoreEntity<T> | null
+      >;
     }
 
     static update(

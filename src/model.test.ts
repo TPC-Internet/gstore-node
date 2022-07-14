@@ -436,7 +436,7 @@ describe('Model', () => {
         const args = spy.getCall(0).args[0];
         const key = ds.key({ path: ['Blog', 123], namespace: 'com.mydomain' });
         expect(args).deep.equal(key);
-        expect(res.name).equal('John');
+        expect(res!.name).equal('John');
       });
     });
 
@@ -504,7 +504,7 @@ describe('Model', () => {
         return gstore.cache!.keys.set(key, value).then(() =>
           GstoreModel.get(123, undefined, undefined, undefined, { ttl: 334455 }).then((response) => {
             assert.ok(!ds.get.called);
-            expect(response.entityData).include(value);
+            expect(response!.entityData).include(value);
             assert.ok((GstoreModel.gstore.cache!.keys.read as any).called);
             const { args } = (GstoreModel.gstore.cache!.keys.read as any).getCall(0);
             expect(args[0].id).equal(123);
@@ -543,7 +543,7 @@ describe('Model', () => {
           .then(() =>
             GstoreModel.get(123, undefined, undefined, undefined, { cache: false }).then((response) => {
               assert.ok(ds.get.called);
-              expect(response.entityData).contains(entity);
+              expect(response!.entityData).contains(entity);
               ds.get.reset();
               ds.get.resolves([entity]);
             }),
@@ -575,7 +575,7 @@ describe('Model', () => {
           assert.ok(ds.get.called);
           const { args } = ds.get.getCall(0);
           expect(args[0].id).equal(123);
-          expect(response.entityData).include(entity);
+          expect(response!.entityData).include(entity);
         }));
 
       test('should get key from fetchHandler and Dataloader', () => {
@@ -584,7 +584,7 @@ describe('Model', () => {
 
         return GstoreModel.get(123, undefined, undefined, undefined, { dataloader }).then((res) => {
           expect(spy.called).equal(true);
-          expect(res.name).equal('John');
+          expect(res!.name).equal('John');
         });
       });
 
