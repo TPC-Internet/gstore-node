@@ -377,7 +377,7 @@ export const generateModel = <T extends object, M extends object>(
         const entityData = arrify(entityDataFetched);
 
         if (
-          ids.length === 1 &&
+          !Array.isArray(id) &&
           (entityData.length === 0 || typeof entityData[0] === 'undefined' || entityData[0] === null)
         ) {
           if (this.gstore.config.errorOnEntityNotFound) {
