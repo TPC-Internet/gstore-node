@@ -375,7 +375,11 @@ export class GstoreEntity<T extends object = GenericObject> {
   }
 
   get id(): string {
-    return this.entityKey.id || this.entityKey.name!;
+    const id = (this.entityKey.id || this.entityKey.name!) as number | string;
+    if (typeof id === 'number') {
+      return id.toString();
+    }
+    return id;
   }
 
   /**
