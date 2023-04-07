@@ -120,6 +120,6 @@
     "typescript": "^4.0.0"
   },
   "peerDependencies": {
-    "@google-cloud/datastore": ">= 4.2.0 < 7"
+    "@google-cloud/datastore": ">= 4.2.0"
   }
 }
