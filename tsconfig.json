@@ -4,7 +4,7 @@
     "target": "es6",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "strict": true,
     "removeComments": false,
     "esModuleInterop": true,
