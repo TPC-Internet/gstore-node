@@ -304,7 +304,12 @@ export class GstoreEntity<T extends object = GenericObject> {
     if ((this.constructor as Model<T>).__hasCache(options)) {
       return this.gstore.cache!.keys.read(this.entityKey, options).then(onEntityFetched);
     }
-    return this.gstore.ds.get(this.entityKey).then(onEntityFetched);
+    return this.gstore.ds.get(this.entityKey, {
+      gaxOptions: {
+        timeout: 10_000
+      },
+      ...options
+    }).then(onEntityFetched);
   }
 
   /**
