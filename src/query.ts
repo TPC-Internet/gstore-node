@@ -79,11 +79,16 @@ class Query<T extends object, M extends object> {
           .then(populateHandler)
           .then(responseHandler);
       } else {
+        const timeout = Number(process.env.GAX_DEFAULT_TIMEOUT);
+        const noResponseRetries = Number(process.env.GAX_NO_RESPONSE_RETRIES);
         promise = (query as any).__originalRun
           .call(query, {
             gaxOptions: {
-              timeout: 10_000,
-            },
+              timeout: isNaN(timeout) ? 60_000 : timeout,
+              retryRequestOptions: {
+                noResponseRetries: isNaN(noResponseRetries) ? 2  : noResponseRetries,
+              }
+            } as CallOptions,
             ...options,
           })
           .then(onResponse)
