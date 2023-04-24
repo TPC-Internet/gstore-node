@@ -7,6 +7,7 @@ import get from 'lodash.get';
 import set from 'lodash.set';
 
 import { Transaction } from '@google-cloud/datastore';
+import type {CallOptions} from 'google-gax';
 
 import Gstore from './index';
 import Schema, { JoiConfig, SchemaPathDefinition } from './schema';
@@ -822,15 +823,29 @@ export const generateModel = <T extends object, M extends object>(
       dataloader?: any,
       options?: GetOptions,
     ): Promise<EntityData<T> | EntityData<T>[]> {
-      const handler = (useCache = false) => (
-        keys: EntityKey | EntityKey[],
-      ): Promise<EntityData<T> | EntityData<T>[]> => {
+      if (!options) {
+        options = {
+          gaxOptions: {
+            timeout: 10_000
+          }
+        }
+      } else {
+        if (!options.gaxOptions) {
+          options = {
+            gaxOptions: {
+              timeout: 10_000
+            },
+            ...options
+          }
+        }
+      }
+      const handler = (useCache = false) => (keys: EntityKey | EntityKey[]): Promise<EntityData<T> | EntityData<T>[]> => {
         const keysArray = arrify(keys);
         if (transaction) {
           if (transaction.constructor.name !== 'Transaction') {
             return Promise.reject(new Error('Transaction needs to be a gcloud Transaction'));
           }
-          return transaction.get(keysArray).then(([result]) => arrify(result));
+          return transaction.get(keysArray, options).then(([result]) => arrify(result));
         }
 
         if (dataloader) {
@@ -842,7 +857,7 @@ export const generateModel = <T extends object, M extends object>(
           return dataloader.loadMany(keysArray).then((result: EntityData) => arrify(result));
         }
 
-        return this.gstore.ds.get(keys).then(([result]: [any]) => {
+        return this.gstore.ds.get(keys, options).then(([result]: [any]) => {
           if (!result && useCache) {
             // nsql-cache cannot cache undefined or null results so we short-circuit it by throwing an error
             // and storing the result on the thrown error
@@ -1181,6 +1196,7 @@ interface GetOptions {
    * @link https://sebloix.gitbook.io/gstore-node/cache-dataloader/cache
    */
   ttl?: number | { [propName: string]: number };
+  gaxOptions?: CallOptions;
 }
 
 interface DeleteOptions {

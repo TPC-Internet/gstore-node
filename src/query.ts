@@ -1,6 +1,6 @@
 import extend from 'extend';
 import is from 'is';
-
+import type {CallOptions} from 'google-gax';
 import { Transaction, Query as DatastoreQuery, PropertyFilter, Key } from '@google-cloud/datastore';
 
 import Model from './model';
@@ -80,7 +80,12 @@ class Query<T extends object, M extends object> {
           .then(responseHandler);
       } else {
         promise = (query as any).__originalRun
-          .call(query, options)
+          .call(query, {
+            gaxOptions: {
+              timeout: 10_000,
+            },
+            ...options,
+          })
           .then(onResponse)
           .then(populateHandler)
           .then(responseHandler);
@@ -292,6 +297,7 @@ export interface QueryOptions {
    * @default The cache.ttl.queries value
    */
   ttl?: number | { [propName: string]: number };
+  gaxOptions?: CallOptions;
 }
 
 type SelectProperties<T> = Extract<keyof T, string> | '__key__';
