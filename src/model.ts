@@ -822,15 +822,21 @@ export const generateModel = <T extends object, M extends object>(
       if (!options) {
         options = {
           gaxOptions: {
-            timeout: 10_000
-          }
+            timeout: process.env.GAX_DEFAULT_TIMEOUT ?? 60_000,
+            retryRequestOptions: {
+              noResponseRetries: process.env.GAX_NO_RESPONSE_RETRIES ?? 2
+            }
+          } as CallOptions,
         }
       } else {
         if (!options.gaxOptions) {
           options = {
             gaxOptions: {
-              timeout: 10_000
-            },
+              timeout: process.env.GAX_DEFAULT_TIMEOUT ?? 60_000,
+              retryRequestOptions: {
+                noResponseRetries: process.env.GAX_NO_RESPONSE_RETRIES ?? 2
+              }
+            } as CallOptions,
             ...options
           }
         }

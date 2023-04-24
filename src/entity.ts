@@ -23,6 +23,7 @@ import {
 } from './types';
 import { ValidateResponse } from './helpers/validation';
 import { PopulateHandler } from './helpers/populateHelpers';
+import { CallOptions } from "google-gax";
 
 const { validation, populateHelpers } = helpers;
 const { populateFactory } = populateHelpers;
@@ -306,8 +307,11 @@ export class GstoreEntity<T extends object = GenericObject> {
     }
     return this.gstore.ds.get(this.entityKey, {
       gaxOptions: {
-        timeout: 10_000
-      },
+        timeout: process.env.GAX_DEFAULT_TIMEOUT ?? 60_000,
+        retryRequestOptions: {
+          noResponseRetries: process.env.GAX_NO_RESPONSE_RETRIES ?? 2
+        }
+      } as CallOptions,
       ...options
     }).then(onEntityFetched);
   }

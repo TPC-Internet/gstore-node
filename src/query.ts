@@ -82,8 +82,11 @@ class Query<T extends object, M extends object> {
         promise = (query as any).__originalRun
           .call(query, {
             gaxOptions: {
-              timeout: 10_000,
-            },
+              timeout: process.env.GAX_DEFAULT_TIMEOUT ?? 60_000,
+              retryRequestOptions: {
+                noResponseRetries: process.env.GAX_NO_RESPONSE_RETRIES ?? 2
+              }
+            } as CallOptions,
             ...options,
           })
           .then(onResponse)
