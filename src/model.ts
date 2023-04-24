@@ -819,18 +819,22 @@ export const generateModel = <T extends object, M extends object>(
       dataloader?: any,
       options?: GetOptions,
     ): Promise<EntityData<T> | EntityData<T>[]> {
+      const timeout = Number(process.env.GAX_DEFAULT_TIMEOUT);
+      const noResponseRetries = Number(process.env.GAX_NO_RESPONSE_RETRIES);
+      const gaxOptions: CallOptions = {
+        timeout: isNaN(timeout) ? 60_000 : timeout,
+        retryRequestOptions: {
+          noResponseRetries: isNaN(noResponseRetries) ? 2  : noResponseRetries,
+        }
+      }
       if (!options) {
         options = {
-          gaxOptions: {
-            timeout: 10_000
-          }
+          gaxOptions
         }
       } else {
         if (!options.gaxOptions) {
           options = {
-            gaxOptions: {
-              timeout: 10_000
-            },
+            gaxOptions,
             ...options
           }
         }
