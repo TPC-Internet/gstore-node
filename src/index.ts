@@ -218,7 +218,7 @@ export class Gstore {
         retryRequestOptions: {
           noResponseRetries: isNaN(noResponseRetries) ? 2  : noResponseRetries,
         },
-        ...options,
+        ...options.gaxOptions,
       } as CallOptions,
     );
   }
