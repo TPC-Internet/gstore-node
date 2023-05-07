@@ -20,6 +20,7 @@ import {
   CustomEntityFunction,
   GenericObject,
 } from './types';
+import { CallOptions } from "google-gax";
 
 export interface CacheConfig {
   stores?: any[];
@@ -167,7 +168,7 @@ export class Gstore {
   save(
     entities: GstoreEntity<any> | GstoreEntity<any>[],
     transaction?: Transaction,
-    options: { method?: DatastoreSaveMethod; validate?: boolean } | undefined = {},
+    options: { method?: DatastoreSaveMethod; validate?: boolean, gaxOptions?: CallOptions } | undefined = {},
   ): Promise<
     | [
         {
@@ -210,7 +211,16 @@ export class Gstore {
     }
 
     // We forward the call to google-datastore
-    return this.ds.save(entitiesSerialized);
+    const timeout = Number(process.env.GAX_DEFAULT_TIMEOUT);
+    const noResponseRetries = Number(process.env.GAX_NO_RESPONSE_RETRIES);
+    return this.ds.save(entitiesSerialized, {
+        timeout: isNaN(timeout) ? 60_000 : timeout,
+        retryRequestOptions: {
+          noResponseRetries: isNaN(noResponseRetries) ? 2  : noResponseRetries,
+        },
+        ...options,
+      } as CallOptions,
+    );
   }
 
   /**
