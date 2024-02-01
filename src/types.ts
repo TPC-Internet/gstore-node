@@ -49,7 +49,7 @@ export interface PromiseWithPopulate<T> extends Promise<T> {
  */
 
 // From '@google-cloud/datastore/build/src/query';
-export type DatastoreOperator = '=' | '<' | '>' | '<=' | '>=' | 'HAS_ANCESTOR';
+export type DatastoreOperator = '=' | '<' | '>' | '<=' | '>=' | 'HAS_ANCESTOR' | '!=' | 'IN' | 'NOT_IN';
 
 export interface OrderOptions {
   descending?: boolean;
