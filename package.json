@@ -79,7 +79,7 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
-    "@google-cloud/datastore": "^8.0.0",
+    "@google-cloud/datastore": "^8.5.0",
     "@hapi/joi": "^15.1.1",
     "@types/arrify": "2.0.1",
     "@types/chai": "^4.2.4",
